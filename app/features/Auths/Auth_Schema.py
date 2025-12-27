@@ -22,3 +22,12 @@ class LoginResponseSchema(BaseModel):
     id: int
     email: EmailStr
 
+
+class ChangePasswordSchema(BaseModel):
+    password: str
+    confirmPassword: str
+
+class ChangePasswordResponseSchema(BaseModel):
+    id: int
+    email: EmailStr
+
