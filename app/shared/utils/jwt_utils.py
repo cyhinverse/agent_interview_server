@@ -42,3 +42,14 @@ def verify_access_token(token: str):
         raise UnauthorizedException("Invalid token")
     except Exception:
         raise UnauthorizedException("Could not validate credentials")
+
+def verify_refresh_token(token: str):
+    try:
+        payload = jwt.decode(token, REFRESH_TOKEN_SECRET, algorithms=[ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise UnauthorizedException("Refresh token has expired")
+    except jwt.InvalidTokenError:
+        raise UnauthorizedException("Invalid refresh token")
+    except Exception:
+        raise UnauthorizedException("Could not validate refresh token")

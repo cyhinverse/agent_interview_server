@@ -1,33 +1,31 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
-
 class RegisterSchema(BaseModel):
+    fullName: str
     email: EmailStr
     password: str
-    comfirmPassword: str
-
+    confirmPassword: str
 
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
 
-
-class RegisterResponseSchema(BaseModel):
-    id: int
+class UserResponseSchema(BaseModel):
+    id: str
+    fullName: str
     email: EmailStr
+    role: str
 
+    class Config:
+        from_attributes = True
 
-class LoginResponseSchema(BaseModel):
-    id: int
-    email: EmailStr
-
+class TokenSchema(BaseModel):
+    accessToken: str
+    refreshToken: str
+    user: UserResponseSchema
 
 class ChangePasswordSchema(BaseModel):
-    password: str
+    oldPassword: str
+    newPassword: str
     confirmPassword: str
-
-class ChangePasswordResponseSchema(BaseModel):
-    id: int
-    email: EmailStr
-

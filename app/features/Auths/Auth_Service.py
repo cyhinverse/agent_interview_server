@@ -1,38 +1,80 @@
-
 from app.features.Auths.Auth_Reponsitory import AuthRepository
 from app.features.Auths import Auth_Schema as schema
 from app.shared.utils.security import hash_password, verify_password
-from fastapi import HTTPException
+from app.shared.utils.jwt_utils import create_access_token, create_refresh_token, verify_refresh_token
+from app.shared.exceptions import UnauthorizedException, DuplicatedEntityException, ValidationException
+
 class AuthService:
-    def __init__(self,repo: AuthRepository):
+    def __init__(self, repo: AuthRepository):
         self.repo = repo
 
-    def register(self,data: schema.RegisterSchema) -> schema.RegisterResponseSchema:
-        hashed_password = hash_password(data.password)
-        if not data.password:
-            raise HTTPException(status_code=400,detail="Password is required")
-        
-        if data.password != data.password_confirmation:
-            raise HTTPException(status_code=400,detail="Passwords do not match")
+    async def register(self, data: schema.RegisterSchema):
+        if data.password != data.confirmPassword:
+            raise ValidationException("Passwords do not match")
 
-        if self.repo.get_user_by_email(data.email):
-            raise HTTPException(status_code=400,detail="Email already exists")
-        user_data = data.model_dump()
-        user_data["password"] = hashed_password
-        return self.repo.register(user_data)
-    
-    def login(self,data: schema.LoginSchema) -> schema.LoginResponseSchema:
-        user = self.repo.get_user_by_email(data.email)
+        existing_user = await self.repo.get_by_email(data.email)
+        if existing_user:
+            raise DuplicatedEntityException("Email already exists")
+
+        # Prepare user data
+        user_data = {
+            "fullName": data.fullName,
+            "email": data.email,
+            "password": hash_password(data.password)
+        }
+        
+        user = await self.repo.create_user(user_data)
+        
+        # Generate tokens
+        access_token = create_access_token(data={"sub": user.id})
+        refresh_token = create_refresh_token(data={"sub": user.id})
+        
+        return {
+            "accessToken": access_token,
+            "refreshToken": refresh_token,
+            "user": user
+        }
+
+    async def login(self, data: schema.LoginSchema):
+        user = await self.repo.get_by_email(data.email)
+        if not user or not verify_password(data.password, user.password):
+            raise UnauthorizedException("Incorrect email or password")
+
+        # Generate tokens
+        access_token = create_access_token(data={"sub": user.id})
+        refresh_token = create_refresh_token(data={"sub": user.id})
+        
+        return {
+            "accessToken": access_token,
+            "refreshToken": refresh_token,
+            "user": user
+        }
+
+    async def change_password(self, user_id: str, data: schema.ChangePasswordSchema):
+        if data.newPassword != data.confirmPassword:
+            raise ValidationException("New passwords do not match")
+
+        user = await self.repo.get_by_id(user_id)
+        if not user or not verify_password(data.oldPassword, user.password):
+            raise UnauthorizedException("Incorrect old password")
+
+        hashed_password = hash_password(data.newPassword)
+        return await self.repo.update_password(user_id, hashed_password)
+
+    async def refresh_token(self, refresh_token: str):
+ 
+        payload = verify_refresh_token(refresh_token)
+        user_id = payload.get("sub")
+  
+        user = await self.repo.get_by_id(user_id)
         if not user:
-            raise HTTPException(status_code=401,detail="Incorrect email or password")
-        if not verify_password(data.password,user.password):
-            raise HTTPException(status_code=401,detail="Incorrect email or password")
-        return self.repo.login(data.model_dump())
-    
-    def change_password(self,data: schema.ChangePasswordSchema) -> schema.ChangePasswordResponseSchema:
-        user = self.repo.get_user_by_email(data.email)
-        if not user:
-            raise HTTPException(status_code=401,detail="User not found")
-        if not verify_password(data.password,user.password):
-            raise HTTPException(status_code=401,detail="Incorrect password")
-        return self.repo.change_password(data.model_dump())
+            raise UnauthorizedException("User not found")
+            
+        access_token = create_access_token(data={"sub": user.id})
+        new_refresh_token = create_refresh_token(data={"sub": user.id})
+        
+        return {
+            "accessToken": access_token,
+            "refreshToken": new_refresh_token,
+            "user": user
+        }
