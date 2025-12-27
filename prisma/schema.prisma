@@ -1,14 +1,126 @@
+datasource db {
+  provider = "postgresql"
+}
+
 generator client {
   provider = "prisma-client-py"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
+
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
+  id        String             @id @default(uuid())
+  fullName  String
+  email     String             @unique
+  avatarUrl String?
+  role      UserRole           @default(CANDIDATE)
+  sessions  InterviewSession[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+enum UserRole {
+  CANDIDATE
+  INTERVIEWER
+  ADMIN
+}
+
+
+model InterviewCategory {
+  id           String             @id @default(uuid())
+  name         String         
+  slug         String             @unique 
+  systemPrompt String             @db.Text 
+  language     String             @default("vi-VN")
+  
+  questions    QuestionBank[]     
+  sessions     InterviewSession[]
+  
+  createdAt    DateTime           @default(now())
+}
+
+model QuestionBank {
+  id             String             @id @default(uuid())
+  categoryId     String
+  category       InterviewCategory  @relation(fields: [categoryId], references: [id])
+  questionText   String             @db.Text
+  expectedAnswer String             @db.Text 
+  difficulty     String?           
+  responses      QuestionResponse[]
+}
+
+
+
+model InterviewSession {
+  id           String                @id @default(uuid())
+  userId       String
+  user         User                  @relation(fields: [userId], references: [id])
+  categoryId   String
+  category     InterviewCategory      @relation(fields: [categoryId], references: [id])
+  dailyRoomUrl String                
+  status       SessionStatus         @default(SCHEDULED)
+  transcripts  Transcript[]          
+  artifacts    TechnicalArtifact[]   
+  responses    QuestionResponse[]    
+  report       EvaluationReport?     
+  startTime    DateTime?
+  endTime      DateTime?
+  createdAt    DateTime              @default(now())
+}
+
+enum SessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum TranscriptRole {
+  USER
+  BOT
+}
+
+model Transcript {
+  id        String           @id @default(uuid())
+  sessionId String
+  session   InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      TranscriptRole           
+  content   String           @db.Text
+  latencyMs Int?            
+  createdAt DateTime         @default(now())
+}
+
+
+
+model TechnicalArtifact {
+  id           String           @id @default(uuid())
+  sessionId    String
+  session      InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  language     String           
+  codeContent  String           @db.Text
+  aiAnalysis   String?          @db.Text 
+  createdAt    DateTime         @default(now())
+}
+
+model QuestionResponse {
+  id         String           @id @default(uuid())
+  sessionId  String
+  session    InterviewSession @relation(fields: [sessionId], references: [id])
+  questionId String
+  question   QuestionBank     @relation(fields: [questionId], references: [id])
+  answer     String           @db.Text 
+  score      Float            
+  comment    String?          @db.Text 
+}
+
+model EvaluationReport {
+  id             String           @id @default(uuid())
+  sessionId      String           @unique
+  session        InterviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  overallScore   Float            
+  technicalScore Float            
+  softSkillScore Float            
+  aiFeedback     String           @db.Text 
+  recommendation String           
+  createdAt      DateTime         @default(now())
 }

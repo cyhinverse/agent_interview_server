@@ -8,3 +8,4 @@ def get_interview_repository() -> InterviewRepository:
 
 def get_interview_service(repo: InterviewRepository = Depends(get_interview_repository)) -> InterviewService:
     return InterviewService(repo)
+
