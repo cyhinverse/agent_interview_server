@@ -1,5 +1,5 @@
 from fastapi import Depends
-from app.features.Auths.Auth_Reponsitory import AuthRepository
+from app.features.Auths.Auth_Repository import AuthRepository
 from app.features.Auths.Auth_Service import AuthService
 
 

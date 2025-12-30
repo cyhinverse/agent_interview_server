@@ -1,22 +1,21 @@
 from prisma.models import User
 from app.shared.database import db
-from app.features.Users.User_Schemas import UserCreate, UserUpdate
 
-class UserRepository:
+class AuthRepository:
     # -------------------------------------------------------------------------
-    # Repository for handling User-related database operations.
+    # Repository for handling Authentication-related database operations.
     # -------------------------------------------------------------------------
     
     # -------------------------------------------------------------------------
     # Create a new user in the database.
     #
     # Args:
-    #     data (dict): Dictionary containing user data.
+    #     data (dict): Dictionary containing user data (email, password, etc.).
     #
     # Returns:
     #     User: The created User object.
     # -------------------------------------------------------------------------
-    async def create(self, data: dict) -> User:
+    async def create_user(self, data: dict) -> User:
         return await db.user.create(data=data)
 
     # -------------------------------------------------------------------------
@@ -44,39 +43,17 @@ class UserRepository:
         return await db.user.find_unique(where={"id": user_id})
 
     # -------------------------------------------------------------------------
-    # Retrieve a list of users with pagination.
-    #
-    # Args:
-    #     skip (int): The number of records to skip.
-    #     take (int): The number of records to return.
-    #
-    # Returns:
-    #     List[User]: A list of User objects.
-    # -------------------------------------------------------------------------
-    async def get_all(self, skip: int = 0, take: int = 20):
-        return await db.user.find_many(skip=skip, take=take, order={"createdAt": "desc"})
-
-    # -------------------------------------------------------------------------
-    # Update a user's information.
+    # Update the password for a specific user.
     #
     # Args:
     #     user_id (str): The unique identifier of the user.
-    #     data (dict): Dictionary containing the fields to update.
+    #     hashed_password (str): The new hashed password to be stored.
     #
     # Returns:
     #     User: The updated User object.
     # -------------------------------------------------------------------------
-    async def update(self, user_id: str, data: dict) -> User:
-        return await db.user.update(where={"id": user_id}, data=data)
-
-    # -------------------------------------------------------------------------
-    # Delete a user from the database.
-    #
-    # Args:
-    #     user_id (str): The unique identifier of the user.
-    #
-    # Returns:
-    #     User: The deleted User object.
-    # -------------------------------------------------------------------------
-    async def delete(self, user_id: str) -> User:
-        return await db.user.delete(where={"id": user_id})
+    async def update_password(self, user_id: str, hashed_password: str) -> User:
+        return await db.user.update(
+            where={"id": user_id},
+            data={"password": hashed_password}
+        )
