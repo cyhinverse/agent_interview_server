@@ -1,11 +1,9 @@
 from fastapi import Depends
-from app.features.interviews.interview_repository import InterviewRepository
-from app.features.interviews.interview_service import InterviewService
+from app.features.InterviewCategorys.InterviewCategory_Repository import InterviewCategoryRepository
+from app.features.InterviewCategorys.InterviewCategory_Service import InterviewCategoryService
 
+def get_interview_category_repository() -> InterviewCategoryRepository:
+    return InterviewCategoryRepository()
 
-def get_interview_repository() -> InterviewRepository:
-    return InterviewRepository()
-
-def get_interview_service(repo: InterviewRepository = Depends(get_interview_repository)) -> InterviewService:
-    return InterviewService(repo)
-
+def get_interview_category_service(repo: InterviewCategoryRepository = Depends(get_interview_category_repository)) -> InterviewCategoryService:
+    return InterviewCategoryService(repo)
