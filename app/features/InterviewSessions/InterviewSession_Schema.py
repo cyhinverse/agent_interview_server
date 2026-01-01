@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
-from app.features.InterviewCategorys.InterviewCategory_Schema import InterviewCategoryResponse
+from app.features.InterviewCategories.InterviewCategory_Schema import InterviewCategoryResponse
 from app.features.Users.User_Schemas import UserResponse
 
 class InterviewSessionBase(BaseModel):

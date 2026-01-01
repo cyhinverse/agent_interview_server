@@ -1,5 +1,11 @@
 fastapi
 uvicorn
 sqlalchemy
-pydantic
+pydantic[email]
 python-dotenv
+pipecat-ai[silero]
+onnxruntime
+prisma
+email-validator
+passlib[bcrypt]
+bcrypt

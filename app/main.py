@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 from dotenv import load_dotenv
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -29,6 +30,14 @@ app = FastAPI(
 )
 
 app.add_middleware(AuthMiddleware)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth_router)
 app.include_router(users_router)
