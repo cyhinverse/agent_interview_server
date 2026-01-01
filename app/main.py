@@ -13,6 +13,7 @@ from app.features.Users.User_Router import router as users_router
 from app.features.InterviewCategories.InterviewCategory_Router import router as interview_categories_router
 from app.features.InterviewSessions.InterviewSession_Router import router as interview_sessions_router
 from app.features.QuestionBanks.QuestionBank_Router import router as question_banks_router
+from app.features.QuestionResponses.QuestionResponse_Router import router as question_responses_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -34,6 +35,7 @@ app.include_router(users_router)
 app.include_router(interview_categories_router)
 app.include_router(interview_sessions_router)
 app.include_router(question_banks_router)
+app.include_router(question_responses_router)
 @app.get("/", include_in_schema=False)
 def index():
     return RedirectResponse("/docs")
