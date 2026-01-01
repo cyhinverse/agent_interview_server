@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from typing import List
-from app.features.InterviewCategorys.InterviewCategory_Schema import InterviewCategoryCreate, InterviewCategoryUpdate, InterviewCategoryResponse
-from app.features.InterviewCategorys.InterviewCategory_Service import InterviewCategoryService
-from app.features.InterviewCategorys.InterviewCategory_Dependencies import get_interview_category_service
+from app.features.InterviewCategories.InterviewCategory_Schema import InterviewCategoryCreate, InterviewCategoryUpdate, InterviewCategoryResponse
+from app.features.InterviewCategories.InterviewCategory_Service import InterviewCategoryService
+from app.features.InterviewCategories.InterviewCategory_Dependencies import get_interview_category_service
 
 router = APIRouter(prefix="/interview-categories", tags=["Interview Categories"])
 

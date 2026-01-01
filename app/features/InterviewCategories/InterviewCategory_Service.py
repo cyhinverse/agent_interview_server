@@ -1,6 +1,6 @@
 from typing import List
-from app.features.InterviewCategorys.InterviewCategory_Repository import InterviewCategoryRepository
-from app.features.InterviewCategorys.InterviewCategory_Schema import InterviewCategoryCreate, InterviewCategoryUpdate, InterviewCategoryResponse
+from app.features.InterviewCategories.InterviewCategory_Repository import InterviewCategoryRepository
+from app.features.InterviewCategories.InterviewCategory_Schema import InterviewCategoryCreate, InterviewCategoryUpdate, InterviewCategoryResponse
 from app.shared.exceptions import DuplicatedEntityException, NotFoundException
 
 class InterviewCategoryService:

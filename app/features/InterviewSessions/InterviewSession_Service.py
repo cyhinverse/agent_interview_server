@@ -3,8 +3,11 @@ from uuid import uuid4
 from datetime import datetime
 from app.features.InterviewSessions.InterviewSession_Repository import InterviewSessionRepository
 from app.features.InterviewSessions.InterviewSession_Schema import InterviewSessionCreate, InterviewSessionUpdate, InterviewSessionResponse
-from app.features.InterviewCategorys.InterviewCategory_Repository import InterviewCategoryRepository
+from app.features.InterviewCategories.InterviewCategory_Repository import InterviewCategoryRepository
 from app.shared.exceptions import NotFoundException
+from pipecat.audio.vad.silero import SileroVADAnalyzer
+
+
 
 class InterviewSessionService:
     # -------------------------------------------------------------------------
@@ -128,3 +131,7 @@ class InterviewSessionService:
             raise NotFoundException("Interview Session not found")
             
         await self.repo.delete(session_id)
+    
+
+
+    

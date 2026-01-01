@@ -1,7 +1,7 @@
 from typing import List, Optional
 from prisma.models import InterviewCategory
 from app.shared.database import db
-from app.features.InterviewCategorys.InterviewCategory_Schema import InterviewCategoryCreate, InterviewCategoryUpdate
+from app.features.InterviewCategories.InterviewCategory_Schema import InterviewCategoryCreate, InterviewCategoryUpdate
 
 class InterviewCategoryRepository:
     # -------------------------------------------------------------------------
